@@ -223,6 +223,10 @@
   }
   #save-indicator.show{ opacity:1; }
 </style>
+  
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2A2823">
+<link rel="icon" href="icon-192.png">
 </head>
 <body>
 
@@ -471,6 +475,12 @@ function loadNotes(){
   loadNotes();
 })();
 </script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+</script>
 </body>
 </html>
