@@ -296,15 +296,21 @@
       + ' · ' + d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
   }
 
-  async function loadNotes(){
-    try{
-      const result = await window.storage.get('notes-index-v2', false);
-      notes = result ? JSON.parse(result.value) : [];
-    }catch(e){ notes = []; }
-    notes.sort((a,b) => b.updatedAt - a.updatedAt);
-    renderList();
-    if(notes.length > 0 && window.innerWidth > 720){ selectNote(notes[0].id); }
+function loadNotes(){
+  try{
+    const saved = localStorage.getItem('notes-index-v2');
+    notes = saved ? JSON.parse(saved) : [];
+  }catch(e){
+    notes = [];
   }
+
+  notes.sort((a,b) => b.updatedAt - a.updatedAt);
+  renderList();
+
+  if(notes.length > 0 && window.innerWidth > 720){
+    selectNote(notes[0].id);
+  }
+}
 
   let storageWarningShown = false;
   function showStorageWarning(){
@@ -315,10 +321,13 @@
     banner.classList.add('show');
   }
 
-  async function persistNotes(){
-    try{ await window.storage.set('notes-index-v2', JSON.stringify(notes), false); }
-    catch(e){ console.error('Save failed', e); showStorageWarning(); }
+  function persistNotes(){
+  try{
+    localStorage.setItem('notes-index-v2', JSON.stringify(notes));
+  }catch(e){
+    console.error('Save failed', e);
   }
+}
 
   function escapeHtml(str){
     const div = document.createElement('div');
@@ -400,7 +409,7 @@
       clearTimeout(saveTimeout);
       saveIndicator.classList.remove('show');
       saveTimeout = setTimeout(async () => {
-        await persistNotes();
+        persistNotes();
         saveIndicator.classList.add('show');
         setTimeout(() => saveIndicator.classList.remove('show'), 1200);
       }, 500);
